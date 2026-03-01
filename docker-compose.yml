@@ -1,0 +1,37 @@
+version: "3.9"
+
+# DevSync — local dev docker-compose
+# MySQL on :3309 (avoids conflict with other apps on :3306)
+# Backend runs natively on :9090 via Maven
+# Frontend runs natively on :4300 via npm start
+
+networks:
+  devapp-net:
+    driver: bridge
+
+volumes:
+  devapp-mysql-data:
+
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: devapp-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: devapp
+      MYSQL_USER: devapp
+      MYSQL_PASSWORD: devapp_pass
+    ports:
+      - "3309:3306"
+    volumes:
+      - devapp-mysql-data:/var/lib/mysql
+    networks: [devapp-net]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci

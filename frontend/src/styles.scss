@@ -1,0 +1,102 @@
+// PrimeNG theme — lara-dark-blue
+@import "primeng/resources/themes/lara-dark-blue/theme.css";
+@import "primeng/resources/primeng.min.css";
+@import "primeicons/primeicons.css";
+@import "primeflex/primeflex.css";
+@import "highlight.js/styles/github-dark.css";
+
+:root {
+  --primary-color:        #4F46E5;
+  --primary-color-text:   #ffffff;
+
+  --surface-ground:       #0f172a;
+  --surface-section:      #1e293b;
+  --surface-card:         #1e293b;
+  --surface-overlay:      #334155;
+  --surface-border:       #334155;
+  --surface-hover:        #2d3f55;
+
+  --text-color:           #f1f5f9;
+  --text-color-secondary: #94a3b8;
+
+  --status-backlog:       #6B7280;
+  --status-todo:          #3B82F6;
+  --status-inprogress:    #F59E0B;
+  --status-inreview:      #8B5CF6;
+  --status-done:          #10B981;
+  --status-cancelled:     #EF4444;
+
+  --priority-critical:    #EF4444;
+  --priority-high:        #F59E0B;
+  --priority-medium:      #3B82F6;
+  --priority-low:         #10B981;
+  --priority-none:        #6B7280;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--surface-ground);
+  color: var(--text-color);
+}
+
+// Kanban card hover
+.kanban-card {
+  transition: all 0.2s ease;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(79, 70, 229, 0.15);
+    border-color: var(--primary-color) !important;
+  }
+}
+
+// Commit hash monospace badge
+.commit-hash {
+  font-family: 'JetBrains Mono', monospace;
+  color: #67e8f9;
+  background: rgba(103, 232, 249, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+// Custom scrollbar
+::-webkit-scrollbar       { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--surface-ground); }
+::-webkit-scrollbar-thumb { background: var(--surface-border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
+
+// PrimeNG surface overrides
+.p-card     { background: var(--surface-section); border: 1px solid var(--surface-border); }
+.p-datatable-wrapper { background: var(--surface-section); }
+.p-toolbar  { background: var(--surface-section); border-color: var(--surface-border); }
+.p-sidebar  { background: var(--surface-section); }
+.p-dialog   { background: var(--surface-section); }
+.p-panel    { background: var(--surface-section); border-color: var(--surface-border); }
+
+// Status badge classes
+.status-backlog     { background: var(--status-backlog);    color: #fff; border-radius: 4px; padding: 2px 8px; font-size: 0.75rem; }
+.status-todo        { background: var(--status-todo);       color: #fff; border-radius: 4px; padding: 2px 8px; font-size: 0.75rem; }
+.status-inprogress  { background: var(--status-inprogress); color: #fff; border-radius: 4px; padding: 2px 8px; font-size: 0.75rem; }
+.status-inreview    { background: var(--status-inreview);   color: #fff; border-radius: 4px; padding: 2px 8px; font-size: 0.75rem; }
+.status-done        { background: var(--status-done);       color: #fff; border-radius: 4px; padding: 2px 8px; font-size: 0.75rem; }
+.status-cancelled   { background: var(--status-cancelled);  color: #fff; border-radius: 4px; padding: 2px 8px; font-size: 0.75rem; }
+
+// Priority badge classes
+.priority-critical  { color: var(--priority-critical); }
+.priority-high      { color: var(--priority-high); }
+.priority-medium    { color: var(--priority-medium); }
+.priority-low       { color: var(--priority-low); }
+.priority-none      { color: var(--priority-none); }
+
+// Wiki prose content
+.wiki-content {
+  h1, h2, h3 { color: var(--text-color); border-bottom: 1px solid var(--surface-border); padding-bottom: 0.5rem; }
+  p { line-height: 1.7; color: var(--text-color-secondary); }
+  code { background: var(--surface-overlay); padding: 2px 6px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; }
+  pre { background: var(--surface-overlay); padding: 1rem; border-radius: 8px; overflow-x: auto; }
+  a { color: var(--primary-color); }
+  blockquote { border-left: 3px solid var(--primary-color); padding-left: 1rem; margin-left: 0; color: var(--text-color-secondary); }
+}
