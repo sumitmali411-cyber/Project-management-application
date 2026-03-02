@@ -1,7 +1,7 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { TabViewModule } from 'primeng/tabview';
+import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primeng/tabs';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
@@ -19,7 +19,7 @@ import { TaskService } from '../../core/services/task.service';
     CommonModule,
     DatePipe,
     RouterLink,
-    TabViewModule,
+    Tabs, TabList, Tab, TabPanels, TabPanel,
     CardModule,
     ButtonModule,
     TagModule,
@@ -52,88 +52,97 @@ import { TaskService } from '../../core/services/task.service';
         </div>
 
         <!-- Tabs -->
-        <p-tabView>
-          <!-- Overview Tab -->
-          <p-tabPanel header="Overview">
-            <div class="grid">
-              <div class="col-12 md:col-8">
-                <p-card header="About">
-                  <p style="color:var(--text-color-secondary);line-height:1.7">
-                    {{ project()!.description || 'No description provided.' }}
-                  </p>
-                </p-card>
-              </div>
-              <div class="col-12 md:col-4">
-                <p-card header="Details">
-                  <div class="detail-row">
-                    <span class="detail-label">Owner</span>
-                    <span>{{ project()!.owner?.fullName || '—' }}</span>
-                  </div>
-                  <div class="detail-row">
-                    <span class="detail-label">Status</span>
-                    <span [class]="'status-' + project()!.status?.toLowerCase()">{{ project()!.status }}</span>
-                  </div>
-                  <div class="detail-row">
-                    <span class="detail-label">Created</span>
-                    <span>{{ project()!.createdAt | date:'MMM d, yyyy' }}</span>
-                  </div>
-                </p-card>
-              </div>
-            </div>
-          </p-tabPanel>
+        <p-tabs value="overview">
+          <p-tablist>
+            <p-tab value="overview">Overview</p-tab>
+            <p-tab value="tasks">Tasks</p-tab>
+            <p-tab value="members">Members</p-tab>
+          </p-tablist>
+          <p-tabpanels>
 
-          <!-- Tasks Tab -->
-          <p-tabPanel header="Tasks">
-            <div class="flex justify-content-between align-items-center mb-3">
-              <span style="color:var(--text-color-secondary)">{{ tasks().length }} tasks</span>
-              <p-button label="Go to Board" icon="pi pi-th-large" size="small"
-                [routerLink]="['/tasks']" [queryParams]="{projectId: project()!.id}" />
-            </div>
-            <p-table [value]="tasks()" styleClass="p-datatable-sm" [scrollable]="true" scrollHeight="400px">
-              <ng-template pTemplate="header">
-                <tr>
-                  <th>Title</th>
-                  <th style="width:120px">Status</th>
-                  <th style="width:100px">Priority</th>
-                  <th style="width:120px">Assignee</th>
-                </tr>
-              </ng-template>
-              <ng-template pTemplate="body" let-task>
-                <tr>
-                  <td style="font-size:0.875rem">{{ task.title }}</td>
-                  <td><span [class]="'status-' + task.status?.toLowerCase().replace('_','')">{{ task.status?.replace('_',' ') }}</span></td>
-                  <td><span [class]="'priority-' + task.priority?.toLowerCase()">{{ task.priority }}</span></td>
-                  <td style="font-size:0.85rem">{{ task.assignee?.fullName || '—' }}</td>
-                </tr>
-              </ng-template>
-              <ng-template pTemplate="emptymessage">
-                <tr><td colspan="4" style="text-align:center;color:var(--text-color-secondary);padding:2rem">No tasks yet</td></tr>
-              </ng-template>
-            </p-table>
-          </p-tabPanel>
+            <!-- Overview -->
+            <p-tabpanel value="overview">
+              <div class="grid">
+                <div class="col-12 md:col-8">
+                  <p-card header="About">
+                    <p style="color:var(--text-color-secondary);line-height:1.7">
+                      {{ project()!.description || 'No description provided.' }}
+                    </p>
+                  </p-card>
+                </div>
+                <div class="col-12 md:col-4">
+                  <p-card header="Details">
+                    <div class="detail-row">
+                      <span class="detail-label">Owner</span>
+                      <span>{{ project()!.owner?.fullName || '—' }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="detail-label">Status</span>
+                      <span [class]="'status-' + project()!.status?.toLowerCase()">{{ project()!.status }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="detail-label">Created</span>
+                      <span>{{ project()!.createdAt | date:'MMM d, yyyy' }}</span>
+                    </div>
+                  </p-card>
+                </div>
+              </div>
+            </p-tabpanel>
 
-          <!-- Members Tab -->
-          <p-tabPanel header="Members">
-            @if (members().length === 0) {
-              <p style="color:var(--text-color-secondary);text-align:center;padding:2rem">No members found.</p>
-            }
-            <div class="grid">
-              @for (m of members(); track m.id) {
-                <div class="col-12 md:col-6 lg:col-4">
-                  <div class="member-card p-3 border-round flex align-items-center gap-3">
-                    <p-avatar [label]="getInitials(m.user?.fullName)" shape="circle" size="large"
-                      [style]="{'background-color': 'var(--primary-color)', 'color': '#fff'}" />
-                    <div>
-                      <div style="font-weight:600;color:var(--text-color)">{{ m.user?.fullName || '—' }}</div>
-                      <div style="font-size:0.8rem;color:var(--text-color-secondary)">{{ m.user?.email }}</div>
-                      <span class="role-badge">{{ m.role }}</span>
+            <!-- Tasks -->
+            <p-tabpanel value="tasks">
+              <div class="flex justify-content-between align-items-center mb-3">
+                <span style="color:var(--text-color-secondary)">{{ tasks().length }} tasks</span>
+                <p-button label="Go to Board" icon="pi pi-th-large" size="small"
+                  [routerLink]="['/tasks']" [queryParams]="{projectId: project()!.id}" />
+              </div>
+              <p-table [value]="tasks()" styleClass="p-datatable-sm" [scrollable]="true" scrollHeight="400px">
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th>Title</th>
+                    <th style="width:120px">Status</th>
+                    <th style="width:100px">Priority</th>
+                    <th style="width:120px">Assignee</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-task>
+                  <tr>
+                    <td style="font-size:0.875rem">{{ task.title }}</td>
+                    <td><span [class]="'status-' + task.status?.toLowerCase().replace('_','')">{{ task.status?.replace('_',' ') }}</span></td>
+                    <td><span [class]="'priority-' + task.priority?.toLowerCase()">{{ task.priority }}</span></td>
+                    <td style="font-size:0.85rem">{{ task.assignee?.fullName || '—' }}</td>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage">
+                  <tr><td colspan="4" style="text-align:center;color:var(--text-color-secondary);padding:2rem">No tasks yet</td></tr>
+                </ng-template>
+              </p-table>
+            </p-tabpanel>
+
+            <!-- Members -->
+            <p-tabpanel value="members">
+              @if (members().length === 0) {
+                <p style="color:var(--text-color-secondary);text-align:center;padding:2rem">No members found.</p>
+              }
+              <div class="grid">
+                @for (m of members(); track m.id) {
+                  <div class="col-12 md:col-6 lg:col-4">
+                    <div class="member-card p-3 border-round flex align-items-center gap-3">
+                      <p-avatar [label]="getInitials(m.user?.fullName)" shape="circle" size="large"
+                        [style]="{'background-color': 'var(--primary-color)', 'color': '#fff'}" />
+                      <div>
+                        <div style="font-weight:600;color:var(--text-color)">{{ m.user?.fullName || '—' }}</div>
+                        <div style="font-size:0.8rem;color:var(--text-color-secondary)">{{ m.user?.email }}</div>
+                        <span class="role-badge">{{ m.role }}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              }
-            </div>
-          </p-tabPanel>
-        </p-tabView>
+                }
+              </div>
+            </p-tabpanel>
+
+          </p-tabpanels>
+        </p-tabs>
       }
 
       @if (!loading() && !project()) {

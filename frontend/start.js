@@ -64,11 +64,10 @@ async function main() {
   console.log(`Proxying /api  →  http://localhost:${backendPort}`);
 
   // Also update the backendUrl constant in commits-list if needed (runtime only)
-  const ng = process.platform === 'win32' ? 'ng.cmd' : 'ng';
   const child = spawn(
-    ng,
+    'ng',
     ['serve', '--proxy-config', proxyPath, '--port', String(frontendPort), '--open'],
-    { stdio: 'inherit', shell: false }
+    { stdio: 'inherit', shell: true }   // shell:true needed on Windows for .cmd resolution
   );
 
   const cleanup = () => {

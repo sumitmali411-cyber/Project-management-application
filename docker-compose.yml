@@ -11,6 +11,8 @@ networks:
 
 volumes:
   devapp-mysql-data:
+  portainer-data:
+  keycloak-data:
 
 services:
 
@@ -35,3 +37,29 @@ services:
       retries: 10
       start_period: 30s
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  # ── Portainer — Docker UI at http://localhost:9000 ──────────────────────────
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: devapp-portainer
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer-data:/data
+    networks: [devapp-net]
+
+  # ── Keycloak 24 — Admin console at http://localhost:8180 ────────────────────
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: devapp-keycloak
+    restart: unless-stopped
+    command: start-dev --http-port=8080
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: dev-mem          # in-memory for local dev; swap to mysql for prod
+    ports:
+      - "8280:8080"           # 8180 already used by another Keycloak; using 8280
+    networks: [devapp-net]

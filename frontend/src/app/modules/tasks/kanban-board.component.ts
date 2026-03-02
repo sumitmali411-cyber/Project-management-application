@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { DragDropModule, CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { DropdownModule } from 'primeng/dropdown';
+import { Select } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ToastModule } from 'primeng/toast';
@@ -26,7 +26,7 @@ interface KanbanColumn {
     CommonModule,
     FormsModule,
     DragDropModule,
-    DropdownModule,
+    Select,
     ButtonModule,
     ProgressSpinnerModule,
     ToastModule,
@@ -40,7 +40,7 @@ interface KanbanColumn {
       <div class="flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
         <h2 style="margin:0;color:var(--text-color)">Kanban Board</h2>
         <div class="flex gap-2 align-items-center flex-wrap">
-          <p-dropdown [options]="projects()" optionLabel="name" optionValue="id"
+          <p-select [options]="projects()" optionLabel="name" optionValue="id"
             placeholder="Select Project" [(ngModel)]="selectedProjectId"
             (onChange)="onProjectChange()" styleClass="project-select" />
           <p-button label="New Task" icon="pi pi-plus" (onClick)="showTaskForm = true"

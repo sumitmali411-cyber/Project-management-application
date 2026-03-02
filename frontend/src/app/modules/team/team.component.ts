@@ -6,7 +6,7 @@ import { DataViewModule } from 'primeng/dataview';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { DropdownModule } from 'primeng/dropdown';
+import { Select } from 'primeng/select';
 import { AvatarModule } from 'primeng/avatar';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ToastModule } from 'primeng/toast';
@@ -24,7 +24,7 @@ import { ProjectService, Project } from '../../core/services/project.service';
     ButtonModule,
     DialogModule,
     InputTextModule,
-    DropdownModule,
+    Select,
     AvatarModule,
     ProgressSpinnerModule,
     ToastModule
@@ -39,7 +39,7 @@ import { ProjectService, Project } from '../../core/services/project.service';
           <p style="margin:0.25rem 0 0;color:var(--text-color-secondary)">{{ members().length }} members</p>
         </div>
         <div class="flex gap-2 align-items-center">
-          <p-dropdown [options]="projects()" optionLabel="name" optionValue="id"
+          <p-select [options]="projects()" optionLabel="name" optionValue="id"
             placeholder="Select Project" [(ngModel)]="selectedProjectId"
             (onChange)="onProjectChange()" />
           <p-button label="Invite Member" icon="pi pi-user-plus" (onClick)="showInviteDialog = true"
@@ -105,7 +105,7 @@ import { ProjectService, Project } from '../../core/services/project.service';
         </div>
         <div class="field">
           <label>Role *</label>
-          <p-dropdown formControlName="role" [options]="roles"
+          <p-select formControlName="role" [options]="roles"
             optionLabel="label" optionValue="value" styleClass="w-full" />
         </div>
       </form>

@@ -2,9 +2,9 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
-import { DropdownModule } from 'primeng/dropdown';
+import { Select } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
-import { CalendarModule } from 'primeng/calendar';
+import { DatePicker } from 'primeng/datepicker';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -23,9 +23,9 @@ import { ProjectService, Project } from '../../core/services/project.service';
     DatePipe,
     FormsModule,
     TableModule,
-    DropdownModule,
+    Select,
     ButtonModule,
-    CalendarModule,
+    DatePicker,
     InputTextModule,
     InputNumberModule,
     ProgressSpinnerModule,
@@ -70,16 +70,16 @@ import { ProjectService, Project } from '../../core/services/project.service';
 
       <!-- Toolbar -->
       <div class="flex gap-2 flex-wrap mb-3 align-items-center">
-        <p-dropdown [options]="projects()" optionLabel="name" optionValue="id"
+        <p-select [options]="projects()" optionLabel="name" optionValue="id"
           placeholder="Select Project" [(ngModel)]="selectedProjectId"
           (onChange)="onProjectChange()" style="min-width:200px" />
         <input pInputText placeholder="Filter by branch…" [(ngModel)]="branchFilter"
           (ngModelChange)="applyFilters()" style="width:155px" />
         <input pInputText placeholder="Filter by author…" [(ngModel)]="authorFilter"
           (ngModelChange)="applyFilters()" style="width:155px" />
-        <p-calendar [(ngModel)]="dateFrom" placeholder="From" dateFormat="yy-mm-dd"
+        <p-datepicker [(ngModel)]="dateFrom" placeholder="From" dateFormat="yy-mm-dd"
           (onSelect)="applyFilters()" [showButtonBar]="true" />
-        <p-calendar [(ngModel)]="dateTo"   placeholder="To"   dateFormat="yy-mm-dd"
+        <p-datepicker [(ngModel)]="dateTo"   placeholder="To"   dateFormat="yy-mm-dd"
           (onSelect)="applyFilters()" [showButtonBar]="true" />
       </div>
 
@@ -137,7 +137,7 @@ import { ProjectService, Project } from '../../core/services/project.service';
                 } @else {
                   <p-button label="Link" icon="pi pi-link" styleClass="p-button-text p-button-sm"
                     (onClick)="openLinkDialog(commit)"
-                    style="font-size:0.75rem" />
+                    [style]="{'font-size':'0.75rem'}" />
                 }
               </td>
             </tr>

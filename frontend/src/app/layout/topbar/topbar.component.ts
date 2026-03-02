@@ -6,7 +6,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { BadgeModule } from 'primeng/badge';
 import { MenuModule } from 'primeng/menu';
 import { AvatarModule } from 'primeng/avatar';
-import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { Popover } from 'primeng/popover';
 import { AuthService } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { MenuItem } from 'primeng/api';
@@ -16,7 +16,7 @@ import { MenuItem } from 'primeng/api';
   standalone: true,
   imports: [
     CommonModule, NgStyle, RouterLink,
-    ButtonModule, InputTextModule, BadgeModule, MenuModule, AvatarModule, OverlayPanelModule
+    ButtonModule, InputTextModule, BadgeModule, MenuModule, AvatarModule, Popover
   ],
   template: `
     <div class="layout-topbar flex align-items-center justify-content-between px-4 py-2"
@@ -44,7 +44,7 @@ import { MenuItem } from 'primeng/api';
           }
         </div>
 
-        <p-overlayPanel #notifPanel>
+        <p-popover #notifPanel>
           <div style="width:320px; max-height:400px; overflow-y:auto;">
             <div class="flex align-items-center justify-content-between mb-3">
               <span class="font-semibold">Notifications</span>
@@ -55,7 +55,7 @@ import { MenuItem } from 'primeng/api';
               No new notifications
             </p>
           </div>
-        </p-overlayPanel>
+        </p-popover>
 
         <p-avatar
           [label]="auth.currentUser()?.fullName?.charAt(0) || 'U'"

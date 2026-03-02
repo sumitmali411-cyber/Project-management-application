@@ -1,7 +1,7 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { TabViewModule } from 'primeng/tabview';
+import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primeng/tabs';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
@@ -22,7 +22,7 @@ import { ApiService } from '../../core/services/api.service';
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
-    TabViewModule,
+    Tabs, TabList, Tab, TabPanels, TabPanel,
     CardModule,
     InputTextModule,
     PasswordModule,
@@ -38,109 +38,117 @@ import { ApiService } from '../../core/services/api.service';
     <div class="p-4" style="max-width:800px;margin:0 auto">
       <h2 style="margin:0 0 1.5rem;color:var(--text-color)">Settings</h2>
 
-      <p-tabView>
-        <!-- Profile Tab -->
-        <p-tabPanel header="Profile">
-          <div class="flex align-items-center gap-4 mb-4">
-            <p-avatar [label]="getInitials()" shape="circle" size="xlarge"
-              [style]="{'background-color':'var(--primary-color)','color':'#fff','font-weight':'700','font-size':'1.25rem'}" />
-            <div>
-              <div style="font-size:1.25rem;font-weight:600;color:var(--text-color)">{{ auth.currentUser()?.fullName }}</div>
-              <div style="color:var(--text-color-secondary)">{{ auth.currentUser()?.email }}</div>
-              <div style="font-size:0.8rem;color:var(--text-color-secondary);margin-top:2px">
-                Role: <strong style="color:var(--primary-color)">{{ auth.currentUser()?.role }}</strong>
-              </div>
-            </div>
-          </div>
+      <p-tabs value="profile">
+        <p-tablist>
+          <p-tab value="profile">Profile</p-tab>
+          <p-tab value="security">Security</p-tab>
+          <p-tab value="notifications">Notifications</p-tab>
+          <p-tab value="apikeys">API Keys</p-tab>
+        </p-tablist>
+        <p-tabpanels>
 
-          <p-divider />
-
-          <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
-            <div class="grid">
-              <div class="col-12 md:col-6 field">
-                <label>Full Name</label>
-                <input pInputText formControlName="fullName" class="w-full" />
-              </div>
-              <div class="col-12 md:col-6 field">
-                <label>Username</label>
-                <input pInputText formControlName="username" class="w-full" />
-              </div>
-              <div class="col-12 field">
-                <label>Avatar URL</label>
-                <input pInputText formControlName="avatarUrl" class="w-full" placeholder="https://..." />
-              </div>
-            </div>
-            <p-button type="submit" label="Save Profile" icon="pi pi-save"
-              [loading]="savingProfile()" [disabled]="profileForm.invalid || savingProfile()" />
-          </form>
-        </p-tabPanel>
-
-        <!-- Security Tab -->
-        <p-tabPanel header="Security">
-          <h3 style="color:var(--text-color);margin:0 0 1.25rem">Change Password</h3>
-          <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" style="max-width:400px">
-            <div class="field">
-              <label>Current Password</label>
-              <p-password formControlName="currentPassword" [feedback]="false" [toggleMask]="true"
-                styleClass="w-full" inputStyleClass="w-full" />
-            </div>
-            <div class="field">
-              <label>New Password</label>
-              <p-password formControlName="newPassword" [toggleMask]="true"
-                styleClass="w-full" inputStyleClass="w-full" />
-              @if (passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched) {
-                <small class="p-error">Min 8 chars, 1 uppercase, 1 number</small>
-              }
-            </div>
-            <div class="field">
-              <label>Confirm New Password</label>
-              <p-password formControlName="confirmPassword" [feedback]="false" [toggleMask]="true"
-                styleClass="w-full" inputStyleClass="w-full" />
-            </div>
-            <p-button type="submit" label="Update Password" icon="pi pi-lock"
-              severity="warning" [loading]="savingPassword()"
-              [disabled]="passwordForm.invalid || savingPassword()" />
-          </form>
-        </p-tabPanel>
-
-        <!-- Notifications Tab -->
-        <p-tabPanel header="Notifications">
-          <h3 style="color:var(--text-color);margin:0 0 1.25rem">Notification Preferences</h3>
-          <div class="flex flex-column gap-3" style="max-width:480px">
-            @for (pref of notifPrefs; track pref.key) {
-              <div class="flex align-items-center justify-content-between notif-row p-3 border-round">
-                <div>
-                  <div style="font-weight:500;color:var(--text-color)">{{ pref.label }}</div>
-                  <div style="font-size:0.8rem;color:var(--text-color-secondary)">{{ pref.desc }}</div>
+          <!-- Profile -->
+          <p-tabpanel value="profile">
+            <div class="flex align-items-center gap-4 mb-4">
+              <p-avatar [label]="getInitials()" shape="circle" size="xlarge"
+                [style]="{'background-color':'var(--primary-color)','color':'#fff','font-weight':'700','font-size':'1.25rem'}" />
+              <div>
+                <div style="font-size:1.25rem;font-weight:600;color:var(--text-color)">{{ auth.currentUser()?.fullName }}</div>
+                <div style="color:var(--text-color-secondary)">{{ auth.currentUser()?.email }}</div>
+                <div style="font-size:0.8rem;color:var(--text-color-secondary);margin-top:2px">
+                  Role: <strong style="color:var(--primary-color)">{{ auth.currentUser()?.role }}</strong>
                 </div>
-                <p-checkbox [(ngModel)]="pref.enabled" [binary]="true" />
               </div>
-            }
-            <p-button label="Save Preferences" icon="pi pi-save" (onClick)="saveNotifPrefs()"
-              [loading]="savingNotifs()" />
-          </div>
-        </p-tabPanel>
-
-        <!-- API Keys Tab -->
-        <p-tabPanel header="API Keys">
-          <h3 style="color:var(--text-color);margin:0 0 0.5rem">API Access</h3>
-          <p style="color:var(--text-color-secondary);margin:0 0 1.5rem">
-            Use API keys to authenticate programmatic access to DevSync.
-          </p>
-          <div class="api-key-box p-3 border-round mb-3">
-            <div style="font-size:0.75rem;color:var(--text-color-secondary);margin-bottom:0.5rem">Your API Key</div>
-            <div style="font-family:monospace;color:#67e8f9;word-break:break-all">
-              {{ apiKey() || 'Generate a key below' }}
             </div>
-          </div>
-          <p-button label="Generate New API Key" icon="pi pi-key"
-            severity="secondary" (onClick)="generateApiKey()" [loading]="generatingKey()" />
-          <p class="mt-2" style="font-size:0.8rem;color:var(--priority-critical)">
-            <i class="pi pi-exclamation-triangle mr-1"></i>
-            Generating a new key will invalidate the previous one.
-          </p>
-        </p-tabPanel>
-      </p-tabView>
+            <p-divider />
+            <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+              <div class="grid">
+                <div class="col-12 md:col-6 field">
+                  <label>Full Name</label>
+                  <input pInputText formControlName="fullName" class="w-full" />
+                </div>
+                <div class="col-12 md:col-6 field">
+                  <label>Username</label>
+                  <input pInputText formControlName="username" class="w-full" />
+                </div>
+                <div class="col-12 field">
+                  <label>Avatar URL</label>
+                  <input pInputText formControlName="avatarUrl" class="w-full" placeholder="https://..." />
+                </div>
+              </div>
+              <p-button type="submit" label="Save Profile" icon="pi pi-save"
+                [loading]="savingProfile()" [disabled]="profileForm.invalid || savingProfile()" />
+            </form>
+          </p-tabpanel>
+
+          <!-- Security -->
+          <p-tabpanel value="security">
+            <h3 style="color:var(--text-color);margin:0 0 1.25rem">Change Password</h3>
+            <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" style="max-width:400px">
+              <div class="field">
+                <label>Current Password</label>
+                <p-password formControlName="currentPassword" [feedback]="false" [toggleMask]="true"
+                  styleClass="w-full" inputStyleClass="w-full" />
+              </div>
+              <div class="field">
+                <label>New Password</label>
+                <p-password formControlName="newPassword" [toggleMask]="true"
+                  styleClass="w-full" inputStyleClass="w-full" />
+                @if (passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched) {
+                  <small class="p-error">Min 8 chars, 1 uppercase, 1 number</small>
+                }
+              </div>
+              <div class="field">
+                <label>Confirm New Password</label>
+                <p-password formControlName="confirmPassword" [feedback]="false" [toggleMask]="true"
+                  styleClass="w-full" inputStyleClass="w-full" />
+              </div>
+              <p-button type="submit" label="Update Password" icon="pi pi-lock"
+                severity="warn" [loading]="savingPassword()"
+                [disabled]="passwordForm.invalid || savingPassword()" />
+            </form>
+          </p-tabpanel>
+
+          <!-- Notifications -->
+          <p-tabpanel value="notifications">
+            <h3 style="color:var(--text-color);margin:0 0 1.25rem">Notification Preferences</h3>
+            <div class="flex flex-column gap-3" style="max-width:480px">
+              @for (pref of notifPrefs; track pref.key) {
+                <div class="flex align-items-center justify-content-between notif-row p-3 border-round">
+                  <div>
+                    <div style="font-weight:500;color:var(--text-color)">{{ pref.label }}</div>
+                    <div style="font-size:0.8rem;color:var(--text-color-secondary)">{{ pref.desc }}</div>
+                  </div>
+                  <p-checkbox [(ngModel)]="pref.enabled" [binary]="true" />
+                </div>
+              }
+              <p-button label="Save Preferences" icon="pi pi-save" (onClick)="saveNotifPrefs()"
+                [loading]="savingNotifs()" />
+            </div>
+          </p-tabpanel>
+
+          <!-- API Keys -->
+          <p-tabpanel value="apikeys">
+            <h3 style="color:var(--text-color);margin:0 0 0.5rem">API Access</h3>
+            <p style="color:var(--text-color-secondary);margin:0 0 1.5rem">
+              Use API keys to authenticate programmatic access to DevSync.
+            </p>
+            <div class="api-key-box p-3 border-round mb-3">
+              <div style="font-size:0.75rem;color:var(--text-color-secondary);margin-bottom:0.5rem">Your API Key</div>
+              <div style="font-family:monospace;color:#67e8f9;word-break:break-all">
+                {{ apiKey() || 'Generate a key below' }}
+              </div>
+            </div>
+            <p-button label="Generate New API Key" icon="pi pi-key"
+              severity="secondary" (onClick)="generateApiKey()" [loading]="generatingKey()" />
+            <p class="mt-2" style="font-size:0.8rem;color:var(--priority-critical)">
+              <i class="pi pi-exclamation-triangle mr-1"></i>
+              Generating a new key will invalidate the previous one.
+            </p>
+          </p-tabpanel>
+
+        </p-tabpanels>
+      </p-tabs>
     </div>
   `,
   styles: [`

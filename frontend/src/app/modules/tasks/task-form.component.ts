@@ -3,9 +3,9 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { InputTextareaModule } from 'primeng/inputtextarea';
-import { DropdownModule } from 'primeng/dropdown';
-import { CalendarModule } from 'primeng/calendar';
+import { Textarea } from 'primeng/textarea';
+import { Select } from 'primeng/select';
+import { DatePicker } from 'primeng/datepicker';
 import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { TaskService } from '../../core/services/task.service';
@@ -18,9 +18,9 @@ import { TaskService } from '../../core/services/task.service';
     ReactiveFormsModule,
     DialogModule,
     InputTextModule,
-    InputTextareaModule,
-    DropdownModule,
-    CalendarModule,
+    Textarea,
+    Select,
+    DatePicker,
     ButtonModule,
     InputNumberModule
   ],
@@ -36,12 +36,12 @@ import { TaskService } from '../../core/services/task.service';
         <div class="grid">
           <div class="col-6 field">
             <label>Type</label>
-            <p-dropdown formControlName="taskType" [options]="taskTypes"
+            <p-select formControlName="taskType" [options]="taskTypes"
               optionLabel="label" optionValue="value" styleClass="w-full" />
           </div>
           <div class="col-6 field">
             <label>Priority</label>
-            <p-dropdown formControlName="priority" [options]="priorities"
+            <p-select formControlName="priority" [options]="priorities"
               optionLabel="label" optionValue="value" styleClass="w-full" />
           </div>
         </div>
@@ -49,7 +49,7 @@ import { TaskService } from '../../core/services/task.service';
         <div class="grid">
           <div class="col-6 field">
             <label>Due Date</label>
-            <p-calendar formControlName="dueDate" styleClass="w-full" dateFormat="yy-mm-dd" />
+            <p-datepicker formControlName="dueDate" styleClass="w-full" dateFormat="yy-mm-dd" />
           </div>
           <div class="col-6 field">
             <label>Story Points</label>
@@ -59,7 +59,7 @@ import { TaskService } from '../../core/services/task.service';
 
         <div class="field">
           <label>Description</label>
-          <textarea pInputTextarea formControlName="description" class="w-full" rows="4"
+          <textarea pTextarea formControlName="description" class="w-full" rows="4"
             placeholder="Describe the task…"></textarea>
         </div>
       </form>
