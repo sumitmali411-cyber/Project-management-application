@@ -1,0 +1,73 @@
+version: "3.9"
+
+# DevSync — local dev docker-compose
+# MySQL on :3309 (avoids conflict with other apps on :3306)
+# Backend runs natively on :9090 via Maven
+# Frontend runs natively on :4300 via npm start
+
+networks:
+  devapp-net:
+    driver: bridge
+
+volumes:
+  devapp-mysql-data:
+  portainer-data:
+  keycloak-data:
+
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: devapp-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: devapp
+      MYSQL_USER: devapp
+      MYSQL_PASSWORD: devapp_pass
+    ports:
+      - "3309:3306"
+    volumes:
+      - devapp-mysql-data:/var/lib/mysql
+    networks: [devapp-net]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  # ── Portainer — Docker UI at http://localhost:9000 ──────────────────────────
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: devapp-portainer
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer-data:/data
+    networks: [devapp-net]
+
+  # ── Keycloak 24 — Admin console at http://localhost:8180 ────────────────────
+  # Shared with JIRA-Clone (same port 8180, separate realm "devsync").
+  # Only start this if JIRA-Clone's Keycloak is NOT already running on 8180.
+  # Use profile: docker-compose --profile standalone-keycloak up -d
+  # When running both apps together, JIRA-Clone's start.sh manages Keycloak.
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: devapp-keycloak
+    restart: unless-stopped
+    command: start-dev --http-port=8080
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: dev-mem          # in-memory for local dev; swap to mysql for prod
+      JAVA_OPTS_APPEND: "-Xms64m -Xmx256m"
+    ports:
+      - "8180:8080"           # Shared port with JIRA-Clone (same server, different realms)
+    volumes:
+      - keycloak-data:/opt/keycloak/data
+    networks: [devapp-net]
+    profiles: ["standalone-keycloak"]   # Only starts when JIRA-Clone KC not running

@@ -1,0 +1,73 @@
+# Port is chosen at startup by PortConfig.java (defaults to 9090, auto-increments if busy)
+# Override with: SERVER_PORT env var or -Dserver.port=XXXX
+server:
+  port: ${SERVER_PORT:9090}
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Keycloak OIDC issuer URI — DevSync realm
+          # Local dev: http://localhost:8180/realms/devsync (shared with JIRA-Clone's Keycloak)
+          # K8s:       http://keycloak:8080/realms/devsync  (set via KEYCLOAK_ISSUER_URI env)
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8180/realms/devsync}
+  datasource:
+    url: jdbc:mysql://localhost:3309/devapp?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: ${MYSQL_USER:devapp}
+    password: ${MYSQL_PASSWORD:devapp_pass}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    user: ${MYSQL_ROOT_USER:root}
+    password: ${MYSQL_ROOT_PASSWORD:root}
+
+application:
+  jwt:
+    secret: ${JWT_SECRET:devapp-super-secret-key-change-in-production-256bits-long}
+    expiration: 86400000        # 24 hours
+    refresh-expiration: 604800000  # 7 days
+
+app:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4300,http://localhost:4200}
+  rate-limit:
+    requests-per-minute: 100
+    webhook-requests-per-minute: 30
+
+# GitHub webhook secret — must match the value set in GitHub repo → Settings → Webhooks
+# Generate with: openssl rand -hex 32
+# Leave empty in local dev to skip signature validation (logs a warning)
+webhook:
+  github:
+    secret: ${GITHUB_WEBHOOK_SECRET:}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+
+logging:
+  level:
+    com.devapp: DEBUG
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: alpha
+    tags-sorter: alpha
+  api-docs:
+    path: /v3/api-docs

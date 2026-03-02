@@ -1,0 +1,49 @@
+# ── Node / Frontend ──────────────────────────────────────────────
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/.proxy.conf.tmp.json
+npm-debug.log*
+yarn-error.log*
+
+# ── Java / Maven / Backend ───────────────────────────────────────
+backend/target/
+*.class
+*.jar
+*.war
+.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties
+
+# ── IDE / OS ─────────────────────────────────────────────────────
+.idea/
+*.iml
+.vscode/
+*.suo
+*.user
+.DS_Store
+Thumbs.db
+
+# ── Secrets / Env ────────────────────────────────────────────────
+.env
+.env.*
+*.pem
+*.key
+
+# ── Logs ─────────────────────────────────────────────────────────
+logs/
+*.log
+
+# ── Docker volumes / Keycloak local install ───────────────────────
+devapp-mysql-data/
+.keycloak-local/
+
+# ── AI scaffolding prompts / design references ───────────────────
+prompts/
+devapp-ui-demo.html
+
+# ── Claude Code local settings (developer-specific, not shared) ──
+.claude/
+
+# ── K8s secrets (use sealed-secrets / external-secrets in prod) ──
+k8s/01-secrets.yaml
