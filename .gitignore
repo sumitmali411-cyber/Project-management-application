@@ -34,8 +34,9 @@ Thumbs.db
 logs/
 *.log
 
-# ── Docker volumes ───────────────────────────────────────────────
+# ── Docker volumes / Keycloak local install ───────────────────────
 devapp-mysql-data/
+.keycloak-local/
 
 # ── AI scaffolding prompts / design references ───────────────────
 prompts/

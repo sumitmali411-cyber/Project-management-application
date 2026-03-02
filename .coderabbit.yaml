@@ -1,5 +1,0 @@
-reviews:
-  path_filters:
-    - "!prompts/**"
-    - "!.keycloak-local/**"
-    - "!.claude/**"
