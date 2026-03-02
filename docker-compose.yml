@@ -51,6 +51,10 @@ services:
     networks: [devapp-net]
 
   # ── Keycloak 24 — Admin console at http://localhost:8180 ────────────────────
+  # Shared with JIRA-Clone (same port 8180, separate realm "devsync").
+  # Only start this if JIRA-Clone's Keycloak is NOT already running on 8180.
+  # Use profile: docker-compose --profile standalone-keycloak up -d
+  # When running both apps together, JIRA-Clone's start.sh manages Keycloak.
   keycloak:
     image: quay.io/keycloak/keycloak:24.0
     container_name: devapp-keycloak
@@ -60,6 +64,10 @@ services:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
       KC_DB: dev-mem          # in-memory for local dev; swap to mysql for prod
+      JAVA_OPTS_APPEND: "-Xms64m -Xmx256m"
     ports:
-      - "8280:8080"           # 8180 already used by another Keycloak; using 8280
+      - "8180:8080"           # Shared port with JIRA-Clone (same server, different realms)
+    volumes:
+      - keycloak-data:/opt/keycloak/data
     networks: [devapp-net]
+    profiles: ["standalone-keycloak"]   # Only starts when JIRA-Clone KC not running

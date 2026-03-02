@@ -4,6 +4,14 @@ server:
   port: ${SERVER_PORT:9090}
 
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Keycloak OIDC issuer URI — DevSync realm
+          # Local dev: http://localhost:8180/realms/devsync (shared with JIRA-Clone's Keycloak)
+          # K8s:       http://keycloak:8080/realms/devsync  (set via KEYCLOAK_ISSUER_URI env)
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8180/realms/devsync}
   datasource:
     url: jdbc:mysql://localhost:3309/devapp?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: ${MYSQL_USER:devapp}
@@ -31,7 +39,7 @@ application:
 
 app:
   cors:
-    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4300}
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4300,http://localhost:4200}
   rate-limit:
     requests-per-minute: 100
     webhook-requests-per-minute: 30

@@ -1,41 +1,44 @@
 /* ============================================================
-   DevSync — Keycloak Dark Theme
-   Matches: background #0A0F1E | accent #6366F1 | card #111827
+   Project Management — Keycloak Dark Theme
+   Palette: bg #0A0F1E | card #111827 | accent #6366F1
+   Font:    DM Sans (matches the app)
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap');
 
-/* ── Reset / Root ─────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+/* ── CSS variables ─────────────────────────────────────────── */
 :root {
   --bg:        #0A0F1E;
   --card:      #111827;
+  --card-hov:  #141e2e;
   --border:    rgba(255,255,255,0.08);
   --accent:    #6366F1;
   --accent-hv: #4F46E5;
+  --accent-glow: rgba(99,102,241,0.18);
   --text:      #F1F5F9;
   --muted:     #94A3B8;
   --error:     #EF4444;
+  --error-bg:  rgba(239,68,68,0.10);
+  --error-bdr: rgba(239,68,68,0.30);
   --success:   #10B981;
-  --radius:    8px;
+  --r:         8px;
 }
 
-/* ── Body / Page ──────────────────────────────────────────── */
-body {
-  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: var(--bg);
-  color: var(--text);
+/* ── Reset ─────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Page ──────────────────────────────────────────────────── */
+body,
+.login-pf body {
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  background: var(--bg) !important;
+  color: var(--text) !important;
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-/* ── Login Card Container ─────────────────────────────────── */
-#kc-container,
-.login-pf body,
-#kc-container-wrapper {
+/* full-page centering wrapper */
+#kc-container-wrapper,
+#kc-container {
   background: var(--bg) !important;
   min-height: 100vh;
   display: flex;
@@ -43,82 +46,120 @@ body {
   justify-content: center;
 }
 
+/* ── Card ──────────────────────────────────────────────────── */
 .card-pf,
 #kc-container .card-pf {
   background: var(--card) !important;
   border: 1px solid var(--border) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 24px 48px rgba(0,0,0,0.4) !important;
-  padding: 2.5rem !important;
+  border-radius: 14px !important;
+  box-shadow: 0 0 0 1px rgba(99,102,241,0.06),
+              0 20px 60px rgba(0,0,0,0.55) !important;
+  padding: 2.5rem 2.25rem !important;
   width: 100% !important;
-  max-width: 420px !important;
+  max-width: 430px !important;
 }
 
-/* ── Logo / Brand ─────────────────────────────────────────── */
+/* ── Brand header ──────────────────────────────────────────── */
 #kc-header,
 #kc-header-wrapper {
   background: transparent !important;
-  text-align: center !important;
-  margin-bottom: 0.5rem !important;
   padding: 0 !important;
-}
-
-#kc-page-title,
-.instruction,
-#kc-header h1 {
-  color: var(--text) !important;
-  font-size: 1.5rem !important;
-  font-weight: 700 !important;
+  margin-bottom: 0.25rem !important;
   text-align: center !important;
 }
 
-.subtitle {
+/* clear the default keycloak page title text */
+#kc-page-title { display: none !important; }
+
+.pm-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.pm-logo {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(99,102,241,0.45);
+  flex-shrink: 0;
+}
+
+.pm-app-name {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.4px;
+  line-height: 1;
+}
+
+/* subtitle under the brand */
+#kc-header-wrapper + * .kc-header-wrapper,
+.instruction {
   color: var(--muted) !important;
-  font-size: 0.875rem !important;
+  font-size: 0.85rem !important;
   text-align: center !important;
+  margin-top: 4px !important;
   margin-bottom: 1.5rem !important;
 }
 
-/* DevSync wordmark injected via ::before */
-#kc-header-wrapper::before {
-  content: '⬡ DevSync';
-  display: block;
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--accent);
-  letter-spacing: -0.5px;
-  margin-bottom: 0.5rem;
-}
+/* ── Section divider ───────────────────────────────────────── */
+#kc-form { margin-top: 1.5rem; }
 
-/* ── Form Groups ──────────────────────────────────────────── */
-.form-group {
-  margin-bottom: 1.1rem !important;
-}
-
+/* ── Labels ────────────────────────────────────────────────── */
 .form-group label,
-label {
+label,
+.kcLabelClass {
   display: block !important;
-  font-size: 0.8rem !important;
+  font-size: 0.775rem !important;
   font-weight: 500 !important;
   color: var(--muted) !important;
-  margin-bottom: 0.4rem !important;
+  margin-bottom: 5px !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.5px !important;
+  letter-spacing: 0.55px !important;
 }
 
-/* ── Inputs ───────────────────────────────────────────────── */
+/* password row: label + forgot link side-by-side */
+.pm-password-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 5px;
+}
+
+.pm-password-header label { margin-bottom: 0 !important; }
+
+.pm-forgot {
+  font-size: 0.775rem !important;
+  color: var(--accent) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-weight: 500 !important;
+  opacity: 0.85;
+  transition: opacity 0.15s;
+}
+.pm-forgot:hover { opacity: 1 !important; }
+
+/* ── Inputs ────────────────────────────────────────────────── */
 input[type="text"],
 input[type="password"],
-input[type="email"] {
+input[type="email"],
+.kcInputClass {
   width: 100% !important;
   background: rgba(255,255,255,0.04) !important;
   border: 1px solid var(--border) !important;
-  border-radius: var(--radius) !important;
+  border-radius: var(--r) !important;
   color: var(--text) !important;
   font-family: inherit !important;
   font-size: 0.9rem !important;
-  padding: 0.65rem 0.875rem !important;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+  padding: 0.65rem 0.9rem !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease !important;
   outline: none !important;
 }
 
@@ -126,72 +167,147 @@ input[type="text"]:focus,
 input[type="password"]:focus,
 input[type="email"]:focus {
   border-color: var(--accent) !important;
-  box-shadow: 0 0 0 3px rgba(99,102,241,0.15) !important;
+  box-shadow: 0 0 0 3px var(--accent-glow) !important;
   background: rgba(255,255,255,0.06) !important;
 }
 
-input[type="text"]::placeholder,
-input[type="password"]::placeholder,
-input[type="email"]::placeholder {
-  color: rgba(148,163,184,0.5) !important;
+input::placeholder { color: rgba(148,163,184,0.45) !important; }
+
+/* password toggle button */
+.kcFormPasswordVisibilityButtonClass,
+button[data-password-toggle] {
+  background: transparent !important;
+  border: none !important;
+  color: var(--muted) !important;
+  cursor: pointer;
+  padding: 0 0.75rem !important;
+}
+.kcFormPasswordVisibilityButtonClass:hover,
+button[data-password-toggle]:hover { color: var(--text) !important; }
+
+/* input group (password + toggle) */
+.input-group,
+.kcInputGroup {
+  display: flex !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--r) !important;
+  overflow: hidden;
+  background: rgba(255,255,255,0.04) !important;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.input-group:focus-within,
+.kcInputGroup:focus-within {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px var(--accent-glow) !important;
+}
+.input-group input[type="password"],
+.kcInputGroup input[type="password"] {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  flex: 1;
 }
 
-/* ── Buttons ──────────────────────────────────────────────── */
+/* ── Form spacing ──────────────────────────────────────────── */
+.form-group { margin-bottom: 1.1rem !important; }
+
+/* ── Remember me ───────────────────────────────────────────── */
+#kc-form-options {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.checkbox label {
+  color: var(--muted) !important;
+  font-size: 0.85rem !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 14px;
+  height: 14px;
+}
+
+/* ── Submit button ─────────────────────────────────────────── */
 .btn-primary,
-input[type="submit"],
-button[type="submit"] {
+input[type="submit"]#kc-login,
+#kc-form-buttons input[type="submit"] {
   background: var(--accent) !important;
   border: none !important;
-  border-radius: var(--radius) !important;
+  border-radius: var(--r) !important;
   color: #fff !important;
   cursor: pointer !important;
   font-family: inherit !important;
-  font-size: 0.9rem !important;
+  font-size: 0.92rem !important;
   font-weight: 600 !important;
-  padding: 0.75rem 1.25rem !important;
+  letter-spacing: 0.1px;
+  padding: 0.72rem 1.25rem !important;
   width: 100% !important;
-  transition: background 0.15s ease, transform 0.1s ease !important;
-  margin-top: 0.5rem !important;
+  transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease !important;
+  margin-top: 0.35rem !important;
+  box-shadow: 0 4px 12px rgba(99,102,241,0.3) !important;
 }
 
 .btn-primary:hover,
-input[type="submit"]:hover,
-button[type="submit"]:hover {
+input[type="submit"]#kc-login:hover,
+#kc-form-buttons input[type="submit"]:hover {
   background: var(--accent-hv) !important;
   transform: translateY(-1px) !important;
+  box-shadow: 0 6px 16px rgba(99,102,241,0.4) !important;
 }
 
-/* ── Links ────────────────────────────────────────────────── */
-a, a:visited {
-  color: var(--accent) !important;
-  text-decoration: none !important;
-  transition: opacity 0.12s !important;
+.btn-primary:active,
+input[type="submit"]#kc-login:active {
+  transform: translateY(0) !important;
 }
 
-a:hover { opacity: 0.8 !important; }
-
-#kc-registration,
+/* ── Register link ─────────────────────────────────────────── */
 #kc-registration-container,
-.registration-container {
+#kc-registration {
   text-align: center !important;
-  margin-top: 1.25rem !important;
+  margin-top: 1.3rem !important;
   font-size: 0.875rem !important;
   color: var(--muted) !important;
 }
 
-/* ── Alerts / Messages ────────────────────────────────────── */
+#kc-registration a,
+#kc-registration-container a {
+  color: var(--accent) !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  margin-left: 4px;
+  transition: opacity 0.15s;
+}
+
+#kc-registration a:hover,
+#kc-registration-container a:hover { opacity: 0.8 !important; }
+
+/* ── Global links ──────────────────────────────────────────── */
+a, a:visited {
+  color: var(--accent) !important;
+  text-decoration: none !important;
+}
+a:hover { opacity: 0.8 !important; }
+
+/* ── Alert / error messages ────────────────────────────────── */
 .alert,
-.kc-feedback-text {
-  border-radius: var(--radius) !important;
+.pf-c-alert {
+  border-radius: var(--r) !important;
   font-size: 0.85rem !important;
-  padding: 0.65rem 0.875rem !important;
+  padding: 0.65rem 0.9rem !important;
   margin-bottom: 1rem !important;
 }
 
-.alert-error,
-.pf-m-danger {
-  background: rgba(239,68,68,0.1) !important;
-  border: 1px solid rgba(239,68,68,0.3) !important;
+.alert-error, .pf-m-danger {
+  background: var(--error-bg) !important;
+  border: 1px solid var(--error-bdr) !important;
   color: #FCA5A5 !important;
 }
 
@@ -202,40 +318,32 @@ a:hover { opacity: 0.8 !important; }
 }
 
 .alert-info, .alert-warning {
-  background: rgba(99,102,241,0.1) !important;
+  background: rgba(99,102,241,0.08) !important;
   border: 1px solid var(--border) !important;
   color: var(--muted) !important;
 }
 
-/* field-level errors */
+/* field-level error text */
 .kc-feedback-text,
 .helper-text--error,
-span.kc-feedback-text {
+span.kc-feedback-text,
+#input-error {
   color: var(--error) !important;
   font-size: 0.78rem !important;
-  margin-top: 3px !important;
+  margin-top: 4px !important;
   display: block !important;
 }
 
-/* ── Remember Me / Checkbox ───────────────────────────────── */
-.checkbox label {
+/* ── Forgot-password page / info text ──────────────────────── */
+#kc-info-message p,
+.instruction {
   color: var(--muted) !important;
-  font-size: 0.85rem !important;
-  text-transform: none !important;
-  letter-spacing: 0 !important;
+  font-size: 0.875rem !important;
+  text-align: center;
+  line-height: 1.5;
 }
 
-/* ── Divider ──────────────────────────────────────────────── */
-.login-pf-signup,
-#kc-form-options {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  margin-bottom: 1rem !important;
-  font-size: 0.85rem !important;
-}
-
-/* ── Social providers ─────────────────────────────────────── */
+/* ── Social providers (if enabled) ────────────────────────── */
 #social-providers {
   margin-top: 1.25rem !important;
   border-top: 1px solid var(--border) !important;
@@ -249,22 +357,17 @@ span.kc-feedback-text {
   margin-bottom: 0.75rem !important;
 }
 
-.social-links .zocial {
-  background: rgba(255,255,255,0.05) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: var(--radius) !important;
-  color: var(--text) !important;
-  margin-bottom: 0.5rem !important;
-  padding: 0.6rem 1rem !important;
-  width: 100% !important;
-  transition: background 0.15s !important;
-}
+/* ── Scrollbar ─────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
 
-.social-links .zocial:hover {
-  background: rgba(255,255,255,0.09) !important;
-}
-
-/* ── Responsive ───────────────────────────────────────────── */
+/* ── Mobile ────────────────────────────────────────────────── */
 @media (max-width: 480px) {
-  .card-pf { border-radius: 0 !important; margin: 0 !important; min-height: 100vh !important; }
+  .card-pf {
+    border-radius: 0 !important;
+    margin: 0 !important;
+    min-height: 100vh !important;
+    padding: 2rem 1.25rem !important;
+  }
 }

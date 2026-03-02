@@ -25,7 +25,7 @@ KC_EXTRACT_DIR="$ROOT/.keycloak-local"
 KC_HOME="$KC_EXTRACT_DIR/keycloak-24.0.0"
 KC_THEME_SRC="$ROOT/keycloak/themes/devsync"
 KC_REALM_JSON="$ROOT/keycloak/realm-config/devsync-realm.json"
-KC_PORT=8280
+KC_PORT=8180   # Shared port with JIRA-Clone (same Keycloak, separate devsync realm)
 LOG_DIR="$ROOT/logs"
 mkdir -p "$LOG_DIR"
 
@@ -74,17 +74,19 @@ until docker exec devapp-mysql mysqladmin ping -h localhost -u root -proot --sil
 done
 ok "MySQL healthy"
 
-# ── 6. Start Keycloak locally ─────────────────────────────────
-info "Starting Keycloak on port $KC_PORT ..."
-nohup "$KC_HOME/bin/kc.sh" start-dev --http-port="$KC_PORT" \
-    > "$LOG_DIR/keycloak.log" 2>&1 &
-echo $! > "$LOG_DIR/keycloak.pid"
-ok "Keycloak starting (PID $(cat "$LOG_DIR/keycloak.pid")) — logs/keycloak.log"
-
-# Wait until ready
-info "Waiting for Keycloak at http://localhost:$KC_PORT ..."
-until curl -sf "http://localhost:$KC_PORT/realms/master" &>/dev/null; do sleep 3; done
-ok "Keycloak up"
+# ── 6. Start Keycloak (or reuse JIRA-Clone's if already running) ──────────────
+if curl -sf "http://localhost:$KC_PORT/realms/master" &>/dev/null; then
+    ok "Keycloak already running at http://localhost:$KC_PORT (reusing JIRA-Clone's instance)"
+else
+    info "Starting Keycloak from ZIP on port $KC_PORT ..."
+    nohup "$KC_HOME/bin/kc.sh" start-dev --http-port="$KC_PORT" \
+        > "$LOG_DIR/keycloak.log" 2>&1 &
+    echo $! > "$LOG_DIR/keycloak.pid"
+    ok "Keycloak starting (PID $(cat "$LOG_DIR/keycloak.pid")) — logs/keycloak.log"
+    info "Waiting for Keycloak at http://localhost:$KC_PORT ..."
+    until curl -sf "http://localhost:$KC_PORT/realms/master" &>/dev/null; do sleep 3; done
+    ok "Keycloak up"
+fi
 
 # ── 7. Import realm ───────────────────────────────────────────
 info "Importing devsync realm..."

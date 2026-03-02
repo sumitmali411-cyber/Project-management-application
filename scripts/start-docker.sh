@@ -10,7 +10,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 KC_THEME_SRC="$ROOT/keycloak/themes/devsync"
 KC_REALM_JSON="$ROOT/keycloak/realm-config/devsync-realm.json"
 KC_CONTAINER="devapp-keycloak"
-KC_URL="http://localhost:8280"
+KC_URL="http://localhost:8180"  # Shared port with JIRA-Clone (same Keycloak, separate realm)
 LOG_DIR="$ROOT/logs"
 mkdir -p "$LOG_DIR"
 
@@ -30,11 +30,11 @@ echo ""
 docker info &>/dev/null || err "Docker is not running."
 ok "Docker running"
 
-# ── 2. Start services ────────────────────────────────────────
-info "Starting MySQL + Keycloak + Portainer..."
+# ── 2. Start MySQL + Portainer (Keycloak is shared — see below) ──────────────
+info "Starting MySQL + Portainer..."
 cd "$ROOT"
-docker-compose up -d mysql keycloak portainer
-ok "Containers started"
+docker-compose up -d mysql portainer
+ok "MySQL + Portainer started"
 
 # ── 3. Wait for MySQL ─────────────────────────────────────────
 info "Waiting for MySQL..."
@@ -43,10 +43,18 @@ until docker exec devapp-mysql mysqladmin ping -h localhost -u root -proot --sil
 done
 ok "MySQL healthy"
 
-# ── 4. Wait for Keycloak ──────────────────────────────────────
-info "Waiting for Keycloak at $KC_URL ..."
-until curl -sf "$KC_URL/realms/master" &>/dev/null; do sleep 3; done
-ok "Keycloak up"
+# ── 4. Keycloak: reuse JIRA-Clone's or start standalone ───────
+# Both apps share one Keycloak on port 8180 with separate realms.
+# JIRA-Clone's realm: jira-clone | DevSync's realm: devsync
+if curl -sf "$KC_URL/realms/master" &>/dev/null; then
+    ok "Keycloak already running at $KC_URL (shared with JIRA-Clone — skipping start)"
+else
+    info "Keycloak not running — starting standalone DevSync Keycloak..."
+    docker-compose --profile standalone-keycloak up -d keycloak
+    info "Waiting for Keycloak at $KC_URL ..."
+    until curl -sf "$KC_URL/realms/master" &>/dev/null; do sleep 3; done
+    ok "Keycloak up"
+fi
 
 # Copy theme
 info "Copying DevSync theme into container..."
@@ -83,7 +91,7 @@ echo "  All services started!"
 echo " ----------------------------------------"
 echo "  App          http://localhost:4300"
 echo "  Backend      http://localhost:9090"
-echo "  Keycloak     http://localhost:8280"
+echo "  Keycloak     http://localhost:8180 (shared with JIRA-Clone)"
 echo "  Portainer    http://localhost:9000"
 echo "  MySQL        localhost:3309"
 echo " ----------------------------------------"

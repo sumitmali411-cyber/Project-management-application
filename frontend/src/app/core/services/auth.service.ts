@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { KeycloakService } from './keycloak.service';
 
 export interface AuthUser {
   id: number;
@@ -32,7 +33,25 @@ export class AuthService {
   readonly currentUser = computed(() => this._user());
   readonly token = computed(() => this._token());
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private kc: KeycloakService
+  ) {}
+
+  /** Called from APP_INITIALIZER after Keycloak init — syncs KC user into signals */
+  syncFromKeycloak(): void {
+    if (!this.kc.isAvailable || !this.kc.isAuthenticated) return;
+    const user: AuthUser = {
+      id: 0,
+      username: this.kc.getUsername(),
+      email: this.kc.getEmail(),
+      fullName: this.kc.getUserFullName() || this.kc.getUsername(),
+      role: this.kc.getRoles().find(r => ['ADMIN', 'PM', 'DEV', 'VIEWER'].includes(r)) ?? 'DEV'
+    };
+    this._token.set('keycloak-sso');
+    this._user.set(user);
+  }
 
   login(email: string, password: string) {
     return this.http.post<{ data: AuthResponse }>(`${this.api}/auth/login`, { email, password }).pipe(
@@ -51,7 +70,11 @@ export class AuthService {
     localStorage.removeItem('user');
     this._token.set(null);
     this._user.set(null);
-    this.router.navigate(['/auth/login']);
+    if (this.kc.isAvailable) {
+      this.kc.logout();
+    } else {
+      this.router.navigate(['/auth/login']);
+    }
   }
 
   private storeAuth(data: AuthResponse) {

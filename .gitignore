@@ -36,3 +36,13 @@ logs/
 
 # ── Docker volumes ───────────────────────────────────────────────
 devapp-mysql-data/
+
+# ── AI scaffolding prompts / design references ───────────────────
+prompts/
+devapp-ui-demo.html
+
+# ── Claude Code local settings (developer-specific, not shared) ──
+.claude/
+
+# ── K8s secrets (use sealed-secrets / external-secrets in prod) ──
+k8s/01-secrets.yaml

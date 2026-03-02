@@ -13,7 +13,7 @@ set "KC_EXTRACT_DIR=%ROOT%\.keycloak-local"
 set "KC_HOME=%KC_EXTRACT_DIR%\keycloak-24.0.0"
 set "KC_THEME_SRC=%ROOT%\keycloak\themes\devsync"
 set "KC_REALM_JSON=%ROOT%\keycloak\realm-config\devsync-realm.json"
-set "KC_PORT=8280"
+set "KC_PORT=8180"
 set "BACKEND_DIR=%ROOT%\backend"
 set "FRONTEND_DIR=%ROOT%\frontend"
 set "LOG_DIR=%ROOT%\logs"
@@ -87,14 +87,19 @@ if errorlevel 1 (
 )
 echo [OK] MySQL healthy
 
-:: ── 6. Start Keycloak locally ─────────────────────────────────
+:: ── 6. Keycloak: reuse JIRA-Clone's if already running ────────
 echo.
-echo [4/6] Starting Keycloak locally on port %KC_PORT% ...
+echo [4/6] Checking Keycloak at http://localhost:%KC_PORT% ...
+curl -s -o nul -w "%%{http_code}" "http://localhost:%KC_PORT%/realms/master" 2>nul | findstr "200" >nul
+if not errorlevel 1 (
+    echo [OK] Keycloak already running — reusing shared instance (JIRA-Clone's Keycloak)
+    goto realm_import
+)
+echo     Keycloak not running — starting from ZIP...
 set "KC_HTTP_PORT=%KC_PORT%"
 start "DevSync Keycloak" /D "%KC_HOME%\bin" cmd /c ^
     "kc.bat start-dev --http-port=%KC_PORT% > "%LOG_DIR%\keycloak.log" 2>&1"
 echo [OK] Keycloak starting — logs: logs\keycloak.log
-
 :: Wait for Keycloak to be ready
 echo     Waiting for Keycloak at http://localhost:%KC_PORT% ...
 :wait_kc
@@ -105,6 +110,7 @@ if errorlevel 1 (
     goto wait_kc
 )
 echo [OK] Keycloak is up
+:realm_import
 
 :: Import realm via kcadm
 echo     Importing devsync realm...

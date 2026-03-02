@@ -10,7 +10,7 @@ set "ROOT=%~dp0.."
 set "KC_THEME_SRC=%ROOT%\keycloak\themes\devsync"
 set "KC_REALM_JSON=%ROOT%\keycloak\realm-config\devsync-realm.json"
 set "KC_CONTAINER=devapp-keycloak"
-set "KC_URL=http://localhost:8280"
+set "KC_URL=http://localhost:8180"
 set "BACKEND_DIR=%ROOT%\backend"
 set "FRONTEND_DIR=%ROOT%\frontend"
 set "LOG_DIR=%ROOT%\logs"
@@ -31,11 +31,11 @@ if errorlevel 1 (
 )
 echo [OK] Docker is running
 
-:: ── 2. Start Docker services ─────────────────────────────────
+:: ── 2. Start MySQL + Portainer (Keycloak shared — see below) ─
 echo.
-echo [1/5] Starting Docker services (MySQL + Keycloak + Portainer)...
+echo [1/5] Starting MySQL + Portainer...
 cd /d "%ROOT%"
-docker-compose up -d mysql keycloak portainer
+docker-compose up -d mysql portainer
 if errorlevel 1 (
     echo [ERROR] docker-compose failed.
     pause & exit /b 1
@@ -53,17 +53,25 @@ if errorlevel 1 (
 )
 echo [OK] MySQL is healthy
 
-:: ── 4. Wait for Keycloak + import realm + copy theme ─────────
+:: ── 4. Keycloak: reuse JIRA-Clone's or start standalone ───────
 echo.
-echo [3/5] Waiting for Keycloak at %KC_URL% ...
+echo [3/5] Checking Keycloak at %KC_URL% ...
+curl -s -o nul -w "%%{http_code}" "%KC_URL%/realms/master" 2>nul | findstr "200" >nul
+if not errorlevel 1 (
+    echo [OK] Keycloak already running — reusing shared instance (JIRA-Clone's Keycloak)
+    goto keycloak_ready
+)
+echo     Keycloak not running — starting standalone DevSync Keycloak...
+docker-compose --profile standalone-keycloak up -d keycloak
 :wait_kc
+timeout /t 5 /nobreak >nul
 curl -s -o nul -w "%%{http_code}" "%KC_URL%/realms/master" 2>nul | findstr "200" >nul
 if errorlevel 1 (
     echo     ... still waiting
-    timeout /t 5 /nobreak >nul
     goto wait_kc
 )
 echo [OK] Keycloak is up
+:keycloak_ready
 
 :: Copy custom theme into container
 echo     Copying DevSync theme into Keycloak container...
@@ -108,7 +116,7 @@ echo   All services started!
 echo  ----------------------------------------
 echo   App          http://localhost:4300
 echo   Backend API  http://localhost:9090
-echo   Keycloak     http://localhost:8280
+echo   Keycloak     http://localhost:8180 (shared with JIRA-Clone)
 echo   Portainer    http://localhost:9000
 echo   MySQL        localhost:3309
 echo  ----------------------------------------

@@ -166,3 +166,92 @@ See `prompts/21-DESIGN-SYSTEM.md` for full token reference and `devapp-ui-demo.h
 - GitHub webhook secret (from GitHub repo settings)
 - JWT secret (32+ chars, set as `JWT_SECRET` env var)
 - Domain names in K8s ingress (replace `devapp.example.com`)
+
+---
+
+## Best Practices
+
+### Spring Boot (DevSync-Specific)
+- Constructor injection only — never `@Autowired` on fields
+- CQRS strictly enforced: `*CommandService` (writes) + `*QueryService` (reads) — never mixed
+- All entities extend `BaseEntity`; all repos extend `BaseRepository<T>`
+- Soft delete via `is_deleted` flag + `@Where(clause="is_deleted=0")` + `@Version` optimistic lock
+- DTOs for all API responses — never expose JPA entities directly
+- All responses wrapped in `ApiResponse<T>`; pagination via `Pageable` (max 100)
+- Domain events published for sensitive operations; handlers use `@Async @EventListener`
+- Audit via `AuditService.log()` in independent transaction for: role changes, deletes, API key ops
+- Circuit Breaker (Resilience4j) on all external calls (Keycloak, Apiman, MySQL)
+- `server.shutdown=graceful` for K8s rolling updates
+
+### Security Non-Negotiables
+- CORS from `@Value("${app.cors.allowed-origins}")` — never hardcode `"*"`
+- Rate limiting: dual-layer — Bucket4j in-app (100/min) + Apiman at gateway (30/min webhooks)
+- Webhook: validate `X-Hub-Signature-256` HMAC-SHA256 + idempotency via `WebhookIdempotencyStore`
+- JWT secret: `JwtStartupValidator` enforces ≥ 32 chars at startup (prevents weak secrets in prod)
+- `@PreAuthorize` with role hierarchy: `ADMIN > PM > DEV > VIEWER` via `@projectAccessGuard` bean
+- Audit trail on: role changes, project delete, member remove, wiki delete, API key ops, user deactivation
+- MySQL app user (`devapp`) is least-privilege; Flyway root only for migrations
+
+### Angular (DevSync-Specific)
+- Standalone components only (no NgModules)
+- Angular Signals for reactive local state
+- Two interceptors: `authInterceptor` (JWT injection) + `errorInterceptor` (401/403 handling)
+- Lazy-loaded routes per feature module
+- Design tokens from `prompts/21-DESIGN-SYSTEM.md` — match `devapp-ui-demo.html` exactly
+- Theme: `lara-dark-blue`, background `#0A0F1E`, accent `#6366F1`
+
+### Docker / Kubernetes
+- K8s: `command:` overrides ENTRYPOINT; use `args:` for subcommands (critical for Keycloak)
+- K8s pod security: `runAsNonRoot: true`, `readOnlyRootFilesystem: true`, `automountServiceAccountToken: false`
+- Secrets in K8s `Secret` objects, never `ConfigMap`
+- Resource limits on all containers (prevents OOM eviction)
+- HPA: CPU 70%, memory 80%, min 2 replicas for stateless services
+- Liveness + readiness probes on every Deployment
+
+### Keycloak
+- Backend uses `spring.security.oauth2.resourceserver.jwt.issuer-uri` (not manual JWT parsing)
+- Frontend: `auth.interceptor.ts` adds Bearer token; `error.interceptor.ts` handles 401 logout
+- Keycloak realm configured via REST API in startup scripts (not manual console clicks)
+
+---
+
+## Quick Start (Local Dev)
+
+```bash
+# Backend
+cd backend
+./mvnw spring-boot:run        # port 9090
+
+# Frontend
+cd frontend
+npm start                      # port 4300
+
+# Full stack with Docker
+docker-compose up -d
+
+# Health check
+curl http://localhost:9090/actuator/health | jq .status
+```
+
+---
+
+## Available Slash Commands (this project)
+
+| Command | Purpose |
+|---------|---------|
+| `/start-devapp` | Start DevSync backend + frontend |
+| `/health-devapp` | Health check for DevSync services |
+| `/review-devapp` | DevSync-specific code review (CQRS, patterns, security) |
+
+## Global Slash Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/architect` | Full architectural review |
+| `/review` | Generic code review (OWASP + Spring + Angular) |
+| `/angular-check` | Angular best practices audit |
+| `/spring-check` | Spring Boot best practices audit |
+| `/docker-check` | Docker/K8s configuration audit |
+| `/keycloak-check` | Keycloak setup verification |
+| `/security-audit` | OWASP Top 10 security audit |
+| `/server-check` | Check which services are running |
